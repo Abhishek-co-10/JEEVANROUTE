@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f766e">
+  <title>JeevanRoute | Emergency Response System</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#" aria-label="JeevanRoute home" onclick="showSection('dashboard', document.querySelector('.nav-item')); return false;">
+        <span class="brand-mark"><i class="fa-solid fa-truck-medical"></i></span>
+        <span><strong>JeevanRoute</strong><small>Emergency response</small></span>
+      </a>
+      <div class="side-label">WORKSPACE</div>
+      <nav class="navigation" aria-label="Main navigation">
+        <button class="nav-item active" data-section="dashboard" onclick="showSection('dashboard', this)"><i class="fa-solid fa-chart-pie"></i><span>Dashboard</span></button>
+        <button class="nav-item" data-section="patients" onclick="showSection('patients', this)"><i class="fa-solid fa-user-injured"></i><span>Patients</span></button>
+        <button class="nav-item" data-section="emergency" onclick="showSection('emergency', this)"><i class="fa-solid fa-triangle-exclamation"></i><span>Emergency queue</span><span class="nav-count" id="nav-queue-count">0</span></button>
+        <button class="nav-item" data-section="ambulances" onclick="showSection('ambulances', this)"><i class="fa-solid fa-truck-medical"></i><span>Ambulances</span></button>
+        <button class="nav-item" data-section="hospitals" onclick="showSection('hospitals', this)"><i class="fa-solid fa-hospital"></i><span>Hospitals</span></button>
+        <button class="nav-item" data-section="history" onclick="showSection('history', this)"><i class="fa-solid fa-clock-rotate-left"></i><span>Dispatch history</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="system-status"><span class="status-dot"></span><span><strong>Demo system online</strong><small>Sample road-network data</small></span></div>
+        <div class="project-tag"><span>College PBL</span><span>DSA + OOP · C++</span></div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div><div class="eyebrow">RURAL EMERGENCY RESPONSE</div><h1 id="page-title">Dashboard</h1><p id="page-subtitle">A clearer view of patients, ambulances and hospital readiness.</p></div>
+        <div class="topbar-actions"><span class="live-pill"><span></span> DEMO LIVE</span><div class="date-display"><i class="fa-regular fa-calendar"></i><span id="current-date"></span></div></div>
+      </header>
+
+      <section id="dashboard" class="page-section active-section">
+        <div class="hero-card">
+          <div class="hero-copy"><span class="hero-kicker"><i class="fa-solid fa-route"></i> ROUTE-AWARE DISPATCH</span><h2>Every minute matters.</h2><p>Find the nearest available ambulance and a suitable hospital using the sample road network.</p><button class="btn btn-light" onclick="showSection('emergency', document.querySelector('[data-section=emergency]'))"><i class="fa-solid fa-plus"></i> Report an emergency</button></div>
+          <div class="hero-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="hero-cross"><i class="fa-solid fa-truck-medical"></i></div><span class="art-pin pin-a"><i class="fa-solid fa-location-dot"></i></span><span class="art-pin pin-b"><i class="fa-solid fa-hospital"></i></span><span class="route-line"></span></div>
+        </div>
+        <div class="stats-grid">
+          <article class="stat-card"><span class="stat-icon teal"><i class="fa-solid fa-users"></i></span><div><p>Total patients</p><strong id="total-patients">0</strong><small>Registered records</small></div></article>
+          <article class="stat-card"><span class="stat-icon amber"><i class="fa-solid fa-triangle-exclamation"></i></span><div><p>Waiting emergencies</p><strong id="queue-count">0</strong><small>In the dispatch queue</small></div></article>
+          <article class="stat-card"><span class="stat-icon blue"><i class="fa-solid fa-truck-medical"></i></span><div><p>Available ambulances</p><strong id="available-ambulances">0</strong><small>Ready for dispatch</small></div></article>
+          <article class="stat-card"><span class="stat-icon purple"><i class="fa-solid fa-hospital"></i></span><div><p>Hospitals in network</p><strong id="total-hospitals">5</strong><small>Sample facilities</small></div></article>
+        </div>
+        <div class="content-grid">
+          <article class="panel"><div class="panel-heading"><div><h3>Emergency queue</h3><p>Requests waiting to be processed</p></div><button class="text-button" onclick="showSection('emergency', document.querySelector('[data-section=emergency]'))">View queue <i class="fa-solid fa-arrow-right"></i></button></div><div id="dashboard-queue" class="queue-preview"></div></article>
+          <article class="panel route-panel"><div class="panel-heading"><div><h3>How routing works</h3><p>Decision flow used in this demo</p></div><span class="mini-icon"><i class="fa-solid fa-code-branch"></i></span></div><ol class="route-steps"><li><span>1</span><div><strong>Locate patient</strong><small>Use the patient's selected village/area.</small></div></li><li><span>2</span><div><strong>Calculate shortest route</strong><small>Dijkstra's algorithm estimates road distance.</small></div></li><li><span>3</span><div><strong>Choose suitable hospital</strong><small>Prefer facilities with ICU and oxygen.</small></div></li></ol></article>
+        </div>
+        <div class="notice"><i class="fa-solid fa-circle-info"></i><p><strong>Prototype limitation:</strong> distances and facility availability are sample data. This page does not use live GPS, traffic or hospital systems. It is decision-support software, not autonomous diagnosis.</p></div>
+      </section>
+
+      <section id="patients" class="page-section">
+        <div class="section-intro"><div><h2>Patient management</h2><p>Register a patient before adding an emergency request.</p></div><button class="btn btn-primary" onclick="openRegisterPatient()"><i class="fa-solid fa-user-plus"></i> Add patient</button></div>
+        <article class="panel"><div class="panel-heading"><div><h3>Registered patients</h3><p>Patient records for this browser session</p></div><span class="count-chip" id="patient-count-chip">0 records</span></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Patient</th><th>Age</th><th>Location</th><th>Action</th></tr></thead><tbody id="patient-table"></tbody></table></div><div id="no-patients" class="empty-state"><i class="fa-solid fa-user-plus"></i><strong>No patients registered</strong><p>Add a patient to begin.</p></div></article>
+      </section>
+
+      <section id="emergency" class="page-section">
+        <div class="section-intro"><div><h2>Emergency management</h2><p>Add a registered patient to the queue, then process the next request.</p></div><span class="queue-status"><span class="status-dot"></span><span id="emergency-queue-badge">0 waiting</span></span></div>
+        <div class="content-grid emergency-grid">
+          <article class="panel"><div class="panel-heading"><div><h3>Report emergency</h3><p>Choose the patient who needs assistance.</p></div><span class="mini-icon danger"><i class="fa-solid fa-bell"></i></span></div><form id="emergency-form"><label for="emergency-patient">Patient</label><select id="emergency-patient" required><option value="">Select a registered patient</option></select><button class="btn btn-primary btn-full" type="submit"><i class="fa-solid fa-plus"></i> Add to emergency queue</button></form><div class="divider"></div><button class="btn btn-dark btn-full" type="button" onclick="processEmergency()"><i class="fa-solid fa-truck-medical"></i> Process next emergency</button><p class="form-hint">Dispatch uses shortest sample road distance to select an available ambulance.</p></article>
+          <article class="panel"><div class="panel-heading"><div><h3>Waiting requests</h3><p>First in, first processed</p></div><span class="count-chip" id="queue-panel-count">0 waiting</span></div><div id="emergency-list" class="queue-list"></div></article>
+        </div>
+        <div id="latest-dispatch" class="dispatch-result hidden"></div>
+      </section>
+
+      <section id="ambulances" class="page-section">
+        <div class="section-intro"><div><h2>Ambulance fleet</h2><p>Availability and base location of each ambulance.</p></div><span class="count-chip"><span id="ambulance-summary">0 available</span></span></div>
+        <div id="ambulance-grid" class="resource-grid"></div>
+        <div class="notice"><i class="fa-solid fa-circle-info"></i><p>After a demo dispatch, use <strong>Mark available</strong> to return that ambulance to service.</p></div>
+      </section>
+
+      <section id="hospitals" class="page-section">
+        <div class="section-intro"><div><h2>Hospital network</h2><p>Sample facility capabilities used for hospital suitability.</p></div><span class="count-chip">5 facilities</span></div>
+        <div id="hospital-grid" class="resource-grid hospitals-grid"></div>
+        <div class="notice"><i class="fa-solid fa-shield-heart"></i><p>ICU and oxygen flags are illustrative only. Always verify real-time capacity and clinical suitability with emergency professionals.</p></div>
+      </section>
+
+      <section id="history" class="page-section">
+        <div class="section-intro"><div><h2>Dispatch history</h2><p>Completed dispatches from the current browser session.</p></div><button class="btn btn-outline" onclick="clearHistory()"><i class="fa-solid fa-trash-can"></i> Clear history</button></div>
+        <article class="panel"><div class="table-wrap"><table><thead><tr><th>Time</th><th>Patient</th><th>Ambulance</th><th>Hospital</th><th>Route distance</th></tr></thead><tbody id="history-table"></tbody></table></div><div id="no-history" class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><strong>No dispatches yet</strong><p>Processed emergencies will appear here.</p></div></article>
+      </section>
+
+      <footer class="page-footer"><span>JeevanRoute · PBL DSA + OOP project</span><span><i class="fa-solid fa-code"></i> Frontend simulation of routing logic</span></footer>
+    </main>
+  </div>
+
+  <div id="patient-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-card"><div class="modal-header"><div><span class="eyebrow">PATIENT RECORD</span><h2 id="modal-title">Register patient</h2></div><button class="icon-button" type="button" onclick="closeRegisterPatient()" aria-label="Close"><i class="fa-solid fa-xmark"></i></button></div>
+      <form id="patient-form"><div class="form-grid"><div class="form-field full"><label for="patient-name">Full name</label><input id="patient-name" name="name" placeholder="Enter patient's name" maxlength="80" required></div><div class="form-field"><label for="patient-age">Age</label><input id="patient-age" name="age" type="number" min="0" max="120" placeholder="Age" required></div><div class="form-field"><label for="patient-location">Current location</label><select id="patient-location" name="location" required><option value="">Select location</option><option>Village A</option><option>Village B</option><option>Village C</option><option>Village D</option><option>Village E</option><option>City Center</option><option>Rural Area</option><option>Main Road</option><option>Village Road</option><option>District Center</option></select></div></div><div class="modal-actions"><button class="btn btn-outline" type="button" onclick="closeRegisterPatient()">Cancel</button><button class="btn btn-primary" type="submit"><i class="fa-solid fa-check"></i> Save patient</button></div></form>
+    </div>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"><span class="toast-symbol"><i id="toast-icon" class="fa-solid fa-check"></i></span><span><strong id="toast-title">Success</strong><small id="toast-message"></small></span><button class="toast-close" onclick="hideToast()" aria-label="Dismiss notification"><i class="fa-solid fa-xmark"></i></button></div>
+  <script src="script.js"></script>
+</body>
+</html>
