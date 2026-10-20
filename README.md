@@ -74,12 +74,12 @@ Academic Purpose
 
 This project is developed as a Project-Based Learning (PBL) project to demonstrate the practical application of Data Structures and Object-Oriented Programming in C++.
 
-👨‍💻 Contributors
+👨‍💻 Contributors :
 
 - Abhishek Yadav
 - Archit Singh
-- Aryan singh
-- Tushar srivastava
+- Aryan Singh
+- Tushar Srivastava
 
  License
  
