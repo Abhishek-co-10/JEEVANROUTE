@@ -76,12 +76,12 @@ This project is developed as a Project-Based Learning (PBL) project to demonstra
 
 👨‍💻 Contributors :
 
-- Abhishek Yadav
+- Abhishek Kumar Yadav
 - Archit Singh
 - Aryan Singh
 - Tushar Srivastava
 
- License
+
  
 This project is intended for educational purposes. 
 ------------------------
