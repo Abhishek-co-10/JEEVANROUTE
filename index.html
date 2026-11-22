@@ -22,6 +22,7 @@
         <button class="nav-item" data-section="emergency" onclick="showSection('emergency', this)"><i class="fa-solid fa-triangle-exclamation"></i><span>Emergency queue</span><span class="nav-count" id="nav-queue-count">0</span></button>
         <button class="nav-item" data-section="ambulances" onclick="showSection('ambulances', this)"><i class="fa-solid fa-truck-medical"></i><span>Ambulances</span></button>
         <button class="nav-item" data-section="hospitals" onclick="showSection('hospitals', this)"><i class="fa-solid fa-hospital"></i><span>Hospitals</span></button>
+        <button class="nav-item" data-section="notifications" onclick="showSection('notifications', this)"><i class="fa-solid fa-bell"></i><span>Hospital alerts</span><span class="nav-count" id="alert-count">0</span></button>
         <button class="nav-item" data-section="history" onclick="showSection('history', this)"><i class="fa-solid fa-clock-rotate-left"></i><span>Dispatch history</span></button>
       </nav>
       <div class="sidebar-bottom">
@@ -49,7 +50,7 @@
         </div>
         <div class="content-grid">
           <article class="panel"><div class="panel-heading"><div><h3>Emergency queue</h3><p>Requests waiting to be processed</p></div><button class="text-button" onclick="showSection('emergency', document.querySelector('[data-section=emergency]'))">View queue <i class="fa-solid fa-arrow-right"></i></button></div><div id="dashboard-queue" class="queue-preview"></div></article>
-          <article class="panel route-panel"><div class="panel-heading"><div><h3>How routing works</h3><p>Decision flow used in this demo</p></div><span class="mini-icon"><i class="fa-solid fa-code-branch"></i></span></div><ol class="route-steps"><li><span>1</span><div><strong>Locate patient</strong><small>Use the patient's selected village/area.</small></div></li><li><span>2</span><div><strong>Calculate shortest route</strong><small>Dijkstra's algorithm estimates road distance.</small></div></li><li><span>3</span><div><strong>Choose suitable hospital</strong><small>Prefer facilities with ICU and oxygen.</small></div></li></ol></article>
+          <article class="panel route-panel"><div class="panel-heading"><div><h3>How routing works</h3><p>Decision flow used in this demo</p></div><span class="mini-icon"><i class="fa-solid fa-code-branch"></i></span></div><ol class="route-steps"><li><span>1</span><div><strong>Locate patient</strong><small>Use the patient's selected village/area.</small></div></li><li><span>2</span><div><strong>Calculate shortest route</strong><small>DFS checks every route and keeps the shortest; BFS finds the fewest stops.</small></div></li><li><span>3</span><div><strong>Choose suitable hospital</strong><small>Match the patient's needs: oxygen, ventilator, ICU, surgeon.</small></div></li></ol></article>
         </div>
         <div class="notice"><i class="fa-solid fa-circle-info"></i><p><strong>Prototype limitation:</strong> distances and facility availability are sample data. This page does not use live GPS, traffic or hospital systems. It is decision-support software, not autonomous diagnosis.</p></div>
       </section>
@@ -62,10 +63,11 @@
       <section id="emergency" class="page-section">
         <div class="section-intro"><div><h2>Emergency management</h2><p>Add a registered patient to the queue, then process the next request.</p></div><span class="queue-status"><span class="status-dot"></span><span id="emergency-queue-badge">0 waiting</span></span></div>
         <div class="content-grid emergency-grid">
-          <article class="panel"><div class="panel-heading"><div><h3>Report emergency</h3><p>Choose the patient who needs assistance.</p></div><span class="mini-icon danger"><i class="fa-solid fa-bell"></i></span></div><form id="emergency-form"><label for="emergency-patient">Patient</label><select id="emergency-patient" required><option value="">Select a registered patient</option></select><button class="btn btn-primary btn-full" type="submit"><i class="fa-solid fa-plus"></i> Add to emergency queue</button></form><div class="divider"></div><button class="btn btn-dark btn-full" type="button" onclick="processEmergency()"><i class="fa-solid fa-truck-medical"></i> Process next emergency</button><p class="form-hint">Dispatch uses shortest sample road distance to select an available ambulance.</p></article>
+          <article class="panel"><div class="panel-heading"><div><h3>Report emergency</h3><p>Choose the patient who needs assistance.</p></div><span class="mini-icon danger"><i class="fa-solid fa-bell"></i></span></div><form id="emergency-form"><label for="emergency-patient">Patient</label><select id="emergency-patient" required><option value="">Select a registered patient</option></select><label for="emergency-severity">Severity</label><select id="emergency-severity"><option value="1">Stable</option><option value="2">Serious</option><option value="3">Critical</option></select><label>Patient needs</label><div class="needs-grid"><label><input type="checkbox" id="need-oxygen"> Oxygen</label><label><input type="checkbox" id="need-ventilator"> Ventilator</label><label><input type="checkbox" id="need-icu"> ICU</label><label><input type="checkbox" id="need-surgeon"> Surgeon</label></div><button class="btn btn-primary btn-full" type="submit"><i class="fa-solid fa-plus"></i> Add to emergency queue</button></form><div class="divider"></div><button class="btn btn-dark btn-full" type="button" onclick="processEmergency()"><i class="fa-solid fa-truck-medical"></i> Process next emergency</button><p class="form-hint">Critical patients are served first. Dispatch picks the nearest capable ambulance and a hospital that meets the patient&rsquo;s needs.</p></article>
           <article class="panel"><div class="panel-heading"><div><h3>Waiting requests</h3><p>First in, first processed</p></div><span class="count-chip" id="queue-panel-count">0 waiting</span></div><div id="emergency-list" class="queue-list"></div></article>
         </div>
         <div id="latest-dispatch" class="dispatch-result hidden"></div>
+        <article class="panel map-panel"><div class="panel-heading"><div><h3>Road map</h3><p>Ambulance route in blue, hospital route in red, patient ringed in amber. Click a road to block or reopen it.</p></div><span class="mini-icon"><i class="fa-solid fa-diagram-project"></i></span></div><div id="road-map"></div></article>
       </section>
 
       <section id="ambulances" class="page-section">
@@ -78,6 +80,14 @@
         <div class="section-intro"><div><h2>Hospital network</h2><p>Sample facility capabilities used for hospital suitability.</p></div><span class="count-chip">5 facilities</span></div>
         <div id="hospital-grid" class="resource-grid hospitals-grid"></div>
         <div class="notice"><i class="fa-solid fa-shield-heart"></i><p>ICU and oxygen flags are illustrative only. Always verify real-time capacity and clinical suitability with emergency professionals.</p></div>
+      </section>
+
+      <section id="notifications" class="page-section">
+        <div class="section-intro"><div><h2>Hospital pre-alerts</h2><p>Incoming ambulance dispatch notifications for the selected hospital.</p></div><span class="count-chip"><i class="fa-solid fa-bell"></i> <span id="notification-count">0 alerts</span></span></div>
+        <div class="notice"><i class="fa-solid fa-circle-info"></i><p>This is a local demonstration dashboard. Alerts are visible in this browser only; no real hospital or external device is contacted.</p></div>
+        <div id="hospital-notification-list" class="notification-list">
+          <div id="no-notifications" class="empty-state"><i class="fa-solid fa-bell-slash"></i><strong>No hospital alerts yet</strong><p>Send a pre-alert after processing an emergency dispatch.</p></div>
+        </div>
       </section>
 
       <section id="history" class="page-section">
